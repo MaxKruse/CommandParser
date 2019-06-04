@@ -21,7 +21,7 @@ namespace CP {
 
 	bool CommandParser::RegisterCommand(Command cmd)
 	{
-		if(!HasCommand(cmd))
+		if(HasCommand(cmd))
 		{
 			m_Commands.emplace_back(cmd);
 			return true;
@@ -43,6 +43,30 @@ namespace CP {
 			found = cmd.Flag == command;
 		}
 
+		return found;
+	}
+
+	bool CommandParser::HasCommand(const std::string& cmdString)
+	{
+		bool found{ false };
+
+		for(const auto& command : m_Commands)
+		{
+			if(command.CommandName == cmdString)
+			{
+				Command cmd = command;
+
+				for (const auto& command : m_Args)
+				{
+					if (found)
+					{
+						break;
+					}
+
+					found = cmd.Flag == command;
+				}
+			}
+		}
 		return found;
 	}
 
