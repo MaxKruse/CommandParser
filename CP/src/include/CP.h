@@ -23,5 +23,6 @@ namespace CP {
 		bool HasCommand(const Command&);
 		bool HasCommand(const std::string&);
 		bool GetCommand(Command*);
+		bool GetCommand(const std::string&, std::string*);
 	};
 }

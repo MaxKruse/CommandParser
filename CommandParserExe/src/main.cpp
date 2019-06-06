@@ -7,7 +7,7 @@ int main(int argc, char** argv)
 
 	auto cmd_version = CP::Command{ "-v", "Version" };
 	auto cmd_version_full = CP::Command{ "-version", "Version" };
-	auto cmd_new_path = CP::Command{ "-path", "Add Path" };
+	auto cmd_new_path = CP::Command{ "-path", "Path" };
 	
 	cmdParser.RegisterCommand(cmd_version);
 	cmdParser.RegisterCommand(cmd_version_full);
@@ -15,17 +15,23 @@ int main(int argc, char** argv)
 
 	if(cmdParser.HasCommand(cmd_version))
 	{
-		printf("Command -v found via CommandStruct!\n");
+		printf("Command -v found via HasCommand(Command)!\n");
 	}
 
 	if(cmdParser.HasCommand("Version"))
 	{
-		printf("Command Version found via string!\n");
+		printf("Command Version found via HasCommand(string)!\n");
 	}
 
-	if(cmdParser.HasCommand(cmd_new_path))
+	if(cmdParser.GetCommand(&cmd_new_path))
 	{
-		cmdParser.GetCommand(&cmd_new_path);
-		printf("Command -path with parameter '%s' found via CommandStruct!\n", cmd_new_path.Parameter.c_str());
+		printf("Command -path with parameter '%s' found via GetCommand(Command*)!\n", cmd_new_path.Parameter.c_str());
+	}
+
+	std::string param;
+
+	if(cmdParser.GetCommand("Path", &param))
+	{
+		printf("Command -path with parameter '%s' found via GetCommand(string, string*)!\n", param.c_str());
 	}
 }

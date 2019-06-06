@@ -72,6 +72,8 @@ namespace CP {
 
 	bool CommandParser::GetCommand(Command* cmd)
 	{
+		if (!HasCommand(*cmd)) return false;
+
 		auto param_before{ false };
 		for (size_t i = 1; i < m_Argc; ++i)
 		{
@@ -82,6 +84,30 @@ namespace CP {
 			}
 		}
 		return param_before;
+	}
+
+	bool CommandParser::GetCommand(const std::string& cmdString, std::string* out)
+	{
+		if (!HasCommand(cmdString)) return false;
+		auto param_before{ false };
+
+		for (const auto& command : m_Commands)
+		{
+			if (command.CommandName == cmdString)
+			{
+
+				for (size_t i = 1; i < m_Argc; ++i)
+				{
+					if (m_Args.at(i) == command.Flag)
+					{
+						*out = m_Args.at(static_cast<size_t>(i + 1));
+						param_before = true;
+					}
+				}
+			}
+		}
+		return param_before;
+
 	}
 }
 
