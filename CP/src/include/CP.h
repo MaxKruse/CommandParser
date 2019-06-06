@@ -16,6 +16,8 @@ namespace CP {
 		std::vector<std::string> m_Args;
 		std::vector<Command> m_Commands;
 
+		bool FlagInArgs(const std::string&, std::string*);
+
 	public:
 		CommandParser(int, char**);
 

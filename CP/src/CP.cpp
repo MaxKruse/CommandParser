@@ -10,6 +10,23 @@ namespace CP {
 			left.Parameter == right.Parameter;
 	}
 
+	bool CommandParser::FlagInArgs(const std::string& flag, std::string* out = nullptr)
+	{
+		auto param_before{ false };
+		for (size_t i = 1; i < m_Argc; ++i)
+		{
+			if (m_Args.at(i) == flag)
+			{
+				if(out != nullptr)
+				{
+					*out = m_Args.at(static_cast<size_t>(i + 1));
+				}				
+				param_before = true;
+			}
+		}
+		return param_before;
+	}
+
 	CommandParser::CommandParser(int argc, char** args)
 		: m_Argc{argc}
 	{
@@ -39,7 +56,6 @@ namespace CP {
 			{
 				break;
 			}
-
 			found = cmd.Flag == command;
 		}
 
@@ -56,14 +72,14 @@ namespace CP {
 			{
 				Command cmd = command;
 
-				for (const auto& command : m_Args)
+				for (const auto& arg : m_Args)
 				{
 					if (found)
 					{
 						break;
 					}
 
-					found = cmd.Flag == command;
+					found = cmd.Flag == arg;
 				}
 			}
 		}
@@ -74,16 +90,7 @@ namespace CP {
 	{
 		if (!HasCommand(*cmd)) return false;
 
-		auto param_before{ false };
-		for (size_t i = 1; i < m_Argc; ++i)
-		{
-			if(m_Args.at(i) == cmd->Flag)
-			{
-				cmd->Parameter = m_Args.at(static_cast<size_t>(i + 1));
-				param_before = true;
-			}
-		}
-		return param_before;
+		return FlagInArgs(cmd->Flag, &cmd->Parameter);
 	}
 
 	bool CommandParser::GetCommand(const std::string& cmdString, std::string* out)
@@ -95,15 +102,7 @@ namespace CP {
 		{
 			if (command.CommandName == cmdString)
 			{
-
-				for (size_t i = 1; i < m_Argc; ++i)
-				{
-					if (m_Args.at(i) == command.Flag)
-					{
-						*out = m_Args.at(static_cast<size_t>(i + 1));
-						param_before = true;
-					}
-				}
+				param_before = FlagInArgs(command.Flag, out);
 			}
 		}
 		return param_before;
