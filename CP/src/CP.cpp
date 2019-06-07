@@ -5,21 +5,28 @@ namespace CP {
 
 	bool operator==(const Command& left, const Command& right)
 	{
-		return left.CommandName == right.CommandName &&
-			left.Flag == right.Flag &&
-			left.Parameter == right.Parameter;
+		return left.Name == right.Name &&
+			left.Flag == right.Flag && 
+			left.Params == right.Params;
 	}
 
-	bool CommandParser::FlagInArgs(const std::string& flag, std::string* out = nullptr)
+	bool operator!=(const Command& left, const Command& right)
+	{
+		return left.Name != right.Name ||
+			left.Flag != right.Flag ||
+			left.Params != right.Params;
+	}
+
+	bool CommandParser::FlagInArgs(const std::string& flag, std::vector<std::string>* out = nullptr)
 	{
 		auto param_before{ false };
-		for (size_t i = 1; i < m_Argc; ++i)
+		for (size_t i = 1; i < static_cast<size_t>(m_Argc); ++i)
 		{
 			if (m_Args.at(i) == flag)
 			{
 				if(out != nullptr)
 				{
-					*out = m_Args.at(static_cast<size_t>(i + 1));
+					out->emplace_back(m_Args.at(static_cast<size_t>(i + 1)));
 				}				
 				param_before = true;
 			}
@@ -36,77 +43,136 @@ namespace CP {
 		}
 	}
 
-	bool CommandParser::RegisterCommand(Command cmd)
+	bool CommandParser::RegisterCommand(const Command& cmd)
 	{
-		if(HasCommand(cmd))
+		m_RegisteredCommands.emplace_back(cmd);
+		if(m_Commands.empty())
 		{
 			m_Commands.emplace_back(cmd);
 			return true;
 		}
+
+		auto exists{ false };
+
+		for(const auto& command : m_Commands)
+		{
+			if(cmd == command)
+			{
+				exists = true;
+				break;
+			}
+		}
+
+		if(!exists)
+		{
+			for(size_t j = 0; j < m_Args.size() - 1; j++)
+			{
+				if(cmd.Flag == m_Args.at(j))
+				{
+					m_Commands.emplace_back(cmd);
+				}
+			}			
+			return true;
+		}
+
 		return false;
 	}
 
-	bool CommandParser::HasCommand(const Command& cmd)
+	void CommandParser::ConsumeFlags()
 	{
-		bool found {false};
-
-		for (const auto& command : m_Args)
+		std::vector<size_t> visited;
+		for(auto& cmd : m_Commands)
 		{
-			if(found)
+			for(size_t i = 0; i < m_Args.size() - 1; i++)
 			{
-				break;
+				if(m_Args.at(i) == cmd.Flag)
+				{
+					for(uint32_t j = 1; j <= cmd.NumParams; j++)
+					{
+						if (m_Args.size() <= i + j)
+							continue;
+						cmd.Params.emplace_back(m_Args.at(i + j));
+						visited.emplace_back(i + j);
+					}
+					visited.emplace_back(i);
+					i += cmd.Params.size();
+				}
 			}
-			found = cmd.Flag == command;
 		}
 
-		return found;
+		std::sort(visited.begin(), visited.end());
+		std::reverse(visited.begin(), visited.end());
+
+		for (size_t i : visited)
+		{
+			m_Args.erase(m_Args.begin() + i);
+		}
+
+		
+	}
+
+	bool CommandParser::RequireParams(const size_t needed) const
+	{
+		return needed == m_Args.size();
+	}
+
+	std::string CommandParser::GetParam(const size_t index)
+	{
+		return m_Args.at(index);
 	}
 
 	bool CommandParser::HasCommand(const std::string& cmdString)
 	{
-		bool found{ false };
-
 		for(const auto& command : m_Commands)
 		{
-			if(command.CommandName == cmdString)
+			if(command.Name == cmdString)
 			{
-				Command cmd = command;
-
-				for (const auto& arg : m_Args)
-				{
-					if (found)
-					{
-						break;
-					}
-
-					found = cmd.Flag == arg;
-				}
+				return true;
 			}
 		}
-		return found;
+		return false;
 	}
 
-	bool CommandParser::GetCommand(Command* cmd)
+	std::vector<std::string>* CommandParser::GetCommandParams(const std::string& cmdString)
 	{
-		if (!HasCommand(*cmd)) return false;
+		if (!HasCommand(cmdString)) return nullptr;
 
-		return FlagInArgs(cmd->Flag, &cmd->Parameter);
-	}
-
-	bool CommandParser::GetCommand(const std::string& cmdString, std::string* out)
-	{
-		if (!HasCommand(cmdString)) return false;
-		auto param_before{ false };
-
-		for (const auto& command : m_Commands)
+		for (auto& command : m_Commands)
 		{
-			if (command.CommandName == cmdString)
+			if (command.Name == cmdString)
 			{
-				param_before = FlagInArgs(command.Flag, out);
+				return &command.Params;
 			}
 		}
-		return param_before;
+		return nullptr;
 
+	}
+
+	void CommandParser::PrintUsage(const std::vector<std::string>& params)
+	{
+		const auto last_slashes = m_Args.at(0).find_last_of("\\") + 1;
+		const auto size_last_thing = m_Args.at(0).size() - last_slashes;
+		auto me = m_Args.at(0).substr(last_slashes, size_last_thing);
+
+		printf("Usage:\n");
+		for(const auto& cmd : m_RegisteredCommands)
+		{
+			printf("%s", me.c_str());
+			for(const auto& str : params)
+			{
+				printf(" <%s>", str.c_str());
+			}
+			printf(" [%s", cmd.Flag.c_str());
+
+			for(uint32_t i = 0; i < cmd.NumParams; i++)
+			{
+				printf(" something");
+			}
+
+			printf("]");
+
+			printf("\n");
+		}
 	}
 }
 

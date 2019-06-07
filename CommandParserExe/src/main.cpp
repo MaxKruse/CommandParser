@@ -5,17 +5,22 @@ int main(int argc, char** argv)
 {
 	CP::CommandParser cmdParser(argc, argv);
 
-	auto cmd_version = CP::Command{ "-v", "Version" };
-	auto cmd_version_full = CP::Command{ "-version", "Version" };
-	auto cmd_new_path = CP::Command{ "-path", "Path" };
-	
-	cmdParser.RegisterCommand(cmd_version);
-	cmdParser.RegisterCommand(cmd_version_full);
-	cmdParser.RegisterCommand(cmd_new_path);
+	auto cmdVersion = CP::Command{ "-v", "Version"};
+	auto cmdVersionFull = CP::Command{ "-version", "Version" };
+	auto cmdNotWorking = CP::Command{ "-useless", "Useless" };
+	auto cmdNewPath = CP::Command{ "-path", "Path", 1 };
 
-	if(cmdParser.HasCommand(cmd_version))
+	bool b;
+	b = cmdParser.RegisterCommand(cmdVersion);
+	b = cmdParser.RegisterCommand(cmdVersionFull);
+	b = cmdParser.RegisterCommand(cmdVersionFull);
+	b = cmdParser.RegisterCommand(cmdNewPath);
+
+	cmdParser.ConsumeFlags();
+	if(!cmdParser.RequireParams(1))
 	{
-		printf("Command -v found via HasCommand(Command)!\n");
+		cmdParser.PrintUsage({"name"});
+		return;
 	}
 
 	if(cmdParser.HasCommand("Version"))
@@ -23,15 +28,13 @@ int main(int argc, char** argv)
 		printf("Command Version found via HasCommand(string)!\n");
 	}
 
-	if(cmdParser.GetCommand(&cmd_new_path))
+	if(cmdParser.HasCommand("Useless"))
 	{
-		printf("Command -path with parameter '%s' found via GetCommand(Command*)!\n", cmd_new_path.Parameter.c_str());
+		printf("Command Useless found via HasCommand(string)!\n");
 	}
 
-	std::string param;
-
-	if(cmdParser.GetCommand("Path", &param))
+	if(cmdParser.HasCommand("Path"))
 	{
-		printf("Command -path with parameter '%s' found via GetCommand(string, string*)!\n", param.c_str());
+		printf("Command -path with parameter '%s' found!\n", cmdParser.GetCommandParams("Path")->at(0).c_str());
 	}
 }

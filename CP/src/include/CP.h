@@ -5,8 +5,10 @@ namespace CP {
 	struct Command
 	{
 		std::string Flag;
-		std::string CommandName;
-		std::string Parameter;
+		std::string Name;
+		uint32_t	NumParams;
+		std::vector<std::string> Params;
+		bool		Exists;
 	};
 
 	class CommandParser
@@ -14,17 +16,21 @@ namespace CP {
 	private:
 		int m_Argc;
 		std::vector<std::string> m_Args;
+		std::vector<Command> m_RegisteredCommands;
 		std::vector<Command> m_Commands;
 
-		bool FlagInArgs(const std::string&, std::string*);
+		bool FlagInArgs(const std::string&, std::vector<std::string>*);
 
 	public:
 		CommandParser(int, char**);
 
-		bool RegisterCommand(Command);
-		bool HasCommand(const Command&);
+		bool RegisterCommand(const Command&);
+		void ConsumeFlags();
+		bool RequireParams(const size_t) const;
+		std::string GetParam(const size_t);
+
 		bool HasCommand(const std::string&);
-		bool GetCommand(Command*);
-		bool GetCommand(const std::string&, std::string*);
+		std::vector<std::string>* GetCommandParams(const std::string&);
+		void PrintUsage(const std::vector<std::string>&);
 	};
 }
