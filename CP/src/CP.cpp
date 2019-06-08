@@ -34,6 +34,30 @@ namespace CP {
 		return param_before;
 	}
 
+	bool CommandParser::FindInParsedCommands(const Command& cmd)
+	{
+		for (const auto& command : m_Commands)
+		{
+			if (cmd == command)
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
+	bool CommandParser::FindInRegisteredCommands(const Command& cmd)
+	{
+		for (const auto& command : m_RegisteredCommands)
+		{
+			if (cmd == command)
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
 	CommandParser::CommandParser(int argc, char** args)
 		: m_Argc{argc}
 	{
@@ -45,25 +69,18 @@ namespace CP {
 
 	bool CommandParser::RegisterCommand(const Command& cmd)
 	{
-		m_RegisteredCommands.emplace_back(cmd);
+		if(!FindInRegisteredCommands(cmd))
+		{
+			m_RegisteredCommands.emplace_back(cmd);
+		}
+
 		if(m_Commands.empty())
 		{
 			m_Commands.emplace_back(cmd);
 			return true;
 		}
 
-		auto exists{ false };
-
-		for(const auto& command : m_Commands)
-		{
-			if(cmd == command)
-			{
-				exists = true;
-				break;
-			}
-		}
-
-		if(!exists)
+		if(!FindInParsedCommands(cmd))
 		{
 			for(size_t j = 0; j < m_Args.size() - 1; j++)
 			{
@@ -154,14 +171,18 @@ namespace CP {
 		const auto size_last_thing = m_Args.at(0).size() - last_slashes;
 		auto me = m_Args.at(0).substr(last_slashes, size_last_thing);
 
-		printf("Usage:\n");
+
+		// Full Usage Command
+		printf("Usage: %s", me.c_str());
+
+		for (const auto& str : params)
+		{
+			printf(" <%s>", str.c_str());
+		}
+
 		for(const auto& cmd : m_RegisteredCommands)
 		{
-			printf("%s", me.c_str());
-			for(const auto& str : params)
-			{
-				printf(" <%s>", str.c_str());
-			}
+			
 			printf(" [%s", cmd.Flag.c_str());
 
 			for(uint32_t i = 0; i < cmd.NumParams; i++)
@@ -170,9 +191,32 @@ namespace CP {
 			}
 
 			printf("]");
-
-			printf("\n");
 		}
+
+		printf("\n\n");
+		printf("Descriptions:");
+
+		// Flag Explanations
+		for (const auto& cmd : m_RegisteredCommands)
+		{
+			printf("\n\n");
+
+			std::string p = "[" + cmd.Flag;
+
+			for (uint32_t i = 0; i < cmd.NumParams; i++)
+			{
+				p += " something";
+			}
+
+			p += "]";
+
+			printf("\t%-*s", 25, p.c_str());
+
+			// TODO(Max): Padding
+			printf("%s", cmd.Description.c_str());
+		}
+
+		printf("\n");
 	}
 }
 

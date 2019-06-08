@@ -6,6 +6,7 @@ namespace CP {
 	{
 		std::string Flag;
 		std::string Name;
+		std::string Description;
 		uint32_t	NumParams;
 		std::vector<std::string> Params;
 		bool		Exists;
@@ -20,6 +21,8 @@ namespace CP {
 		std::vector<Command> m_Commands;
 
 		bool FlagInArgs(const std::string&, std::vector<std::string>*);
+		bool FindInParsedCommands(const Command&);
+		bool FindInRegisteredCommands(const Command&);
 
 	public:
 		CommandParser(int, char**);
