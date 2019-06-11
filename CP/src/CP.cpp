@@ -130,7 +130,7 @@ namespace CP {
 
 	bool CommandParser::RequireParams(const size_t needed) const
 	{
-		return needed == m_Args.size();
+		return needed + 1 == m_Args.size();
 	}
 
 	std::string CommandParser::GetParam(const size_t index)
@@ -187,7 +187,7 @@ namespace CP {
 
 			for(uint32_t i = 0; i < cmd.NumParams; i++)
 			{
-				printf(" something");
+				printf(" param%i", i + 1);
 			}
 
 			printf("]");
@@ -205,7 +205,7 @@ namespace CP {
 
 			for (uint32_t i = 0; i < cmd.NumParams; i++)
 			{
-				p += " something";
+				p += " param" + std::to_string(i + 1);
 			}
 
 			p += "]";

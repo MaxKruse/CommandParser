@@ -5,6 +5,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CP", "CP\CP.vcxproj", "{387
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CommandParserExe", "CommandParserExe\CommandParserExe.vcxproj", "{F3349276-DF2D-B1C8-0860-964DF4B790D4}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CommandParserSingleHeaderUse", "CommandParserSingleHeaderUse\CommandParserSingleHeaderUse.vcxproj", "{89CAD567-7585-C513-1E3D-3E5E0AD70FA4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -19,6 +21,10 @@ Global
 		{F3349276-DF2D-B1C8-0860-964DF4B790D4}.Debug|x64.Build.0 = Debug|x64
 		{F3349276-DF2D-B1C8-0860-964DF4B790D4}.Release|x64.ActiveCfg = Release|x64
 		{F3349276-DF2D-B1C8-0860-964DF4B790D4}.Release|x64.Build.0 = Release|x64
+		{89CAD567-7585-C513-1E3D-3E5E0AD70FA4}.Debug|x64.ActiveCfg = Debug|x64
+		{89CAD567-7585-C513-1E3D-3E5E0AD70FA4}.Debug|x64.Build.0 = Debug|x64
+		{89CAD567-7585-C513-1E3D-3E5E0AD70FA4}.Release|x64.ActiveCfg = Release|x64
+		{89CAD567-7585-C513-1E3D-3E5E0AD70FA4}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -37,3 +37,9 @@ namespace CP {
 		void PrintUsage(const std::vector<std::string>&);
 	};
 }
+
+#ifdef CP_SINGLE_HEADER
+
+#include "../CP.cpp"
+
+#endif
