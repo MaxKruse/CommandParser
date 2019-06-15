@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "CP.h"
+#include <sstream>
 
 namespace CP {
 
@@ -91,11 +92,11 @@ namespace CP {
 		std::vector<size_t> visited;
 		for(auto& cmd : m_RegisteredCommands)
 		{
-			for(size_t i = 0; i < m_Args.size() - 1; i++)
-			{
-				auto flags = SplitVector(cmd.Flag, '/');
+			auto flags = SplitVector(cmd.Flag, '/');
 
-				for(const auto& flag : flags)
+			for (const auto& flag : flags)
+			{
+				for(size_t i = 0; i < m_Args.size(); i++)
 				{
 					if (m_Args.at(i) == flag)
 					{
