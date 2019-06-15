@@ -6,7 +6,7 @@ namespace CP {
 	bool operator==(const Command& left, const Command& right)
 	{
 		return left.Name == right.Name &&
-			left.Flag == right.Flag && 
+			left.Flag.find(right.Flag) != std::string::npos && 
 			left.Params == right.Params;
 	}
 
@@ -17,28 +17,11 @@ namespace CP {
 			left.Params != right.Params;
 	}
 
-	bool CommandParser::FlagInArgs(const std::string& flag, std::vector<std::string>* out = nullptr)
-	{
-		auto param_before{ false };
-		for (size_t i = 1; i < static_cast<size_t>(m_Argc); ++i)
-		{
-			if (m_Args.at(i) == flag)
-			{
-				if(out != nullptr)
-				{
-					out->emplace_back(m_Args.at(static_cast<size_t>(i + 1)));
-				}				
-				param_before = true;
-			}
-		}
-		return param_before;
-	}
-
 	bool CommandParser::FindInParsedCommands(const Command& cmd)
 	{
 		for (const auto& command : m_Commands)
 		{
-			if (cmd == command)
+			if (command == cmd)
 			{
 				return true;
 			}
@@ -50,7 +33,7 @@ namespace CP {
 	{
 		for (const auto& command : m_RegisteredCommands)
 		{
-			if (cmd == command)
+			if (command == cmd)
 			{
 				return true;
 			}
@@ -71,7 +54,20 @@ namespace CP {
 	{
 		if(!FindInRegisteredCommands(cmd))
 		{
-			m_RegisteredCommands.emplace_back(cmd);
+			bool found{ false };
+			for (auto& command : m_RegisteredCommands)
+			{
+				found = cmd.Name == command.Name;
+				if (found)
+				{
+					command.Flag += "/" + cmd.Flag;
+					break;
+				}
+			}
+			if(!found)
+			{
+				m_RegisteredCommands.emplace_back(cmd);	
+			}
 		}
 
 		if(m_Commands.empty())
@@ -167,9 +163,9 @@ namespace CP {
 
 	void CommandParser::PrintUsage(const std::vector<std::string>& params)
 	{
-		const auto last_slashes = m_Args.at(0).find_last_of("\\") + 1;
-		const auto size_last_thing = m_Args.at(0).size() - last_slashes;
-		auto me = m_Args.at(0).substr(last_slashes, size_last_thing);
+		const auto lastSlashes = m_Args.at(0).find_last_of("\\") + 1;
+		const auto sizeLastThing = m_Args.at(0).size() - lastSlashes;
+		const auto me = m_Args.at(0).substr(lastSlashes, sizeLastThing);
 
 
 		// Full Usage Command
@@ -179,6 +175,8 @@ namespace CP {
 		{
 			printf(" <%s>", str.c_str());
 		}
+
+		std::vector<std::string> usedCommandNames(m_RegisteredCommands.size() - 1);
 
 		for(const auto& cmd : m_RegisteredCommands)
 		{
@@ -200,8 +198,7 @@ namespace CP {
 		for (const auto& cmd : m_RegisteredCommands)
 		{
 			printf("\n\n");
-
-			std::string p = "[" + cmd.Flag;
+			auto p = "[" + cmd.Flag;
 
 			for (uint32_t i = 0; i < cmd.NumParams; i++)
 			{
@@ -212,7 +209,6 @@ namespace CP {
 
 			printf("\t%-*s", 25, p.c_str());
 
-			// TODO(Max): Padding
 			printf("%s", cmd.Description.c_str());
 		}
 

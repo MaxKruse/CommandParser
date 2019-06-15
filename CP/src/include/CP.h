@@ -20,7 +20,6 @@ namespace CP {
 		std::vector<Command> m_RegisteredCommands;
 		std::vector<Command> m_Commands;
 
-		bool FlagInArgs(const std::string&, std::vector<std::string>*);
 		bool FindInParsedCommands(const Command&);
 		bool FindInRegisteredCommands(const Command&);
 
