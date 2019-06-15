@@ -70,31 +70,13 @@ namespace CP {
 			}
 		}
 
-		if(m_Commands.empty())
-		{
-			m_Commands.emplace_back(cmd);
-			return true;
-		}
-
-		if(!FindInParsedCommands(cmd))
-		{
-			for(size_t j = 0; j < m_Args.size() - 1; j++)
-			{
-				if(cmd.Flag == m_Args.at(j))
-				{
-					m_Commands.emplace_back(cmd);
-				}
-			}			
-			return true;
-		}
-
 		return false;
 	}
 
 	void CommandParser::ConsumeFlags()
 	{
 		std::vector<size_t> visited;
-		for(auto& cmd : m_Commands)
+		for(auto& cmd : m_RegisteredCommands)
 		{
 			for(size_t i = 0; i < m_Args.size() - 1; i++)
 			{
@@ -105,6 +87,7 @@ namespace CP {
 						if (m_Args.size() <= i + j)
 							continue;
 						cmd.Params.emplace_back(m_Args.at(i + j));
+						m_Commands.emplace_back(cmd);
 						visited.emplace_back(i + j);
 					}
 					visited.emplace_back(i);
@@ -136,13 +119,21 @@ namespace CP {
 
 	bool CommandParser::HasCommand(const std::string& cmdString)
 	{
-		for(const auto& command : m_Commands)
+		bool found{ false };
+		for(const auto& command : m_Args)
 		{
-			if(command.Name == cmdString)
-			{
-				return true;
-			}
+			found = command == cmdString;
+			if (found)
+				return found;
 		}
+
+		for (const auto& command : m_Commands)
+		{
+			found = command.Name == cmdString || command.Flag == cmdString;
+			if (found)
+				return found;
+		}
+
 		return false;
 	}
 

@@ -21,15 +21,7 @@ int main(int argc, char** argv)
 	cmdParser.ConsumeFlags();
 
 
-	if (!cmdParser.RequireParams(1))
-	{
-		cmdParser.PrintUsage({ "name" });
-		return 1;
-	}
-
-	printf("GetParam(1) is %s\n", cmdParser.GetParam(1).c_str());
-
-	if (cmdParser.HasCommand("Version"))
+	if (cmdParser.HasCommand("-v"))
 	{
 		printf("Command Version found via HasCommand(string)!\n");
 	}
@@ -43,4 +35,12 @@ int main(int argc, char** argv)
 	{
 		printf("Command -path with parameter '%s' found!\n", cmdParser.GetCommandParams("Path")->at(0).c_str());
 	}
+
+	if (!cmdParser.RequireParams(1))
+	{
+		cmdParser.PrintUsage({ "name" });
+		return 1;
+	}
+
+	printf("GetParam(1) is %s\n", cmdParser.GetParam(1).c_str());
 }
