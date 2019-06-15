@@ -22,6 +22,7 @@ namespace CP {
 
 		bool FindInParsedCommands(const Command&);
 		bool FindInRegisteredCommands(const Command&);
+		std::vector<std::string> SplitVector(const std::string&, const char& delim);
 
 	public:
 		CommandParser(int, char**);

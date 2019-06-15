@@ -41,6 +41,18 @@ namespace CP {
 		return false;
 	}
 
+	std::vector<std::string> CommandParser::SplitVector(const std::string& s, const char& delim) {
+		std::vector<std::string> result;
+		std::stringstream ss(s);
+		std::string item;
+
+		while (std::getline(ss, item, delim)) {
+			result.push_back(item);
+		}
+
+		return result;
+	}
+
 	CommandParser::CommandParser(int argc, char** args)
 		: m_Argc{argc}
 	{
@@ -57,16 +69,17 @@ namespace CP {
 			bool found{ false };
 			for (auto& command : m_RegisteredCommands)
 			{
-				found = cmd.Name == command.Name;
+				found = cmd.Name == command.Name && command.Flag.find(cmd.Flag) == std::string::npos;
 				if (found)
 				{
 					command.Flag += "/" + cmd.Flag;
 					break;
 				}
 			}
+
 			if(!found)
 			{
-				m_RegisteredCommands.emplace_back(cmd);	
+				m_RegisteredCommands.emplace_back(cmd);
 			}
 		}
 
@@ -80,19 +93,25 @@ namespace CP {
 		{
 			for(size_t i = 0; i < m_Args.size() - 1; i++)
 			{
-				if(m_Args.at(i) == cmd.Flag)
+				auto flags = SplitVector(cmd.Flag, '/');
+
+				for(const auto& flag : flags)
 				{
-					for(uint32_t j = 1; j <= cmd.NumParams; j++)
+					if (m_Args.at(i) == flag)
 					{
-						if (m_Args.size() <= i + j)
-							continue;
-						cmd.Params.emplace_back(m_Args.at(i + j));
+						for (uint32_t j = 1; j <= cmd.NumParams; j++)
+						{
+							if (m_Args.size() <= i + j)
+								continue;
+							cmd.Params.emplace_back(m_Args.at(i + j));
+
+							visited.emplace_back(i + j);
+						}
 						m_Commands.emplace_back(cmd);
-						visited.emplace_back(i + j);
+						visited.emplace_back(i);
+						i += cmd.Params.size();
 					}
-					visited.emplace_back(i);
-					i += cmd.Params.size();
-				}
+				}				
 			}
 		}
 
