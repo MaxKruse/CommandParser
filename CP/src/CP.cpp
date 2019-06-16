@@ -202,7 +202,7 @@ namespace CP {
 			printf("]");
 		}
 
-		printf("\n\n");
+		printf("\n");
 		printf("Descriptions:");
 
 		// Flag Explanations
@@ -223,7 +223,7 @@ namespace CP {
 			printf("%s", cmd.Description.c_str());
 		}
 
-		printf("\n");
+		printf("\n\n");
 	}
 }
 
