@@ -187,41 +187,45 @@ namespace CP {
 			printf(" <%s>", str.c_str());
 		}
 
-		std::vector<std::string> usedCommandNames(m_RegisteredCommands.size() - 1);
 
-		for(const auto& cmd : m_RegisteredCommands)
+		if (m_RegisteredCommands.size() > 0)
 		{
-			
-			printf(" [%s", cmd.Flag.c_str());
+			std::vector<std::string> usedCommandNames(m_RegisteredCommands.size() - 1);
 
-			for(uint32_t i = 0; i < cmd.NumParams; i++)
+			for (const auto& cmd : m_RegisteredCommands)
 			{
-				printf(" param%i", i + 1);
+
+				printf(" [%s", cmd.Flag.c_str());
+
+				for (uint32_t i = 0; i < cmd.NumParams; i++)
+				{
+					printf(" param%i", i + 1);
+				}
+
+				printf("]");
 			}
 
-			printf("]");
-		}
+			printf("\n");
+			printf("Descriptions:");
 
-		printf("\n");
-		printf("Descriptions:");
-
-		// Flag Explanations
-		for (const auto& cmd : m_RegisteredCommands)
-		{
-			printf("\n\n");
-			auto p = "[" + cmd.Flag;
-
-			for (uint32_t i = 0; i < cmd.NumParams; i++)
+			// Flag Explanations
+			for (const auto& cmd : m_RegisteredCommands)
 			{
-				p += " param" + std::to_string(i + 1);
+				printf("\n\n");
+				auto p = "[" + cmd.Flag;
+
+				for (uint32_t i = 0; i < cmd.NumParams; i++)
+				{
+					p += " param" + std::to_string(i + 1);
+				}
+
+				p += "]";
+
+				printf("\t%-*s", 25, p.c_str());
+
+				printf("%s", cmd.Description.c_str());
 			}
-
-			p += "]";
-
-			printf("\t%-*s", 25, p.c_str());
-
-			printf("%s", cmd.Description.c_str());
-		}
+		}		
 
 		printf("\n\n");
 	}
