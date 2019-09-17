@@ -40,6 +40,6 @@ namespace CP {
 
 #ifdef CP_SINGLE_HEADER
 
-#include "CP.cpp"
+#include "../CP.cpp"
 
 #endif
