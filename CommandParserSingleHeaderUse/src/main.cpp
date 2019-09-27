@@ -24,16 +24,19 @@ int main(int argc, char** argv)
 	if (cmdParser.HasCommand("-v"))
 	{
 		printf("Command Version found via HasCommand(string)!\n");
+		return;
 	}
 
 	if (cmdParser.HasCommand("Useless"))
 	{
 		printf("Command Useless found via HasCommand(string)!\n");
+		return;
 	}
 
 	if (cmdParser.HasCommand("Path"))
 	{
 		printf("Command -path with parameter '%s' found!\n", cmdParser.GetCommandParams("Path")->at(0).c_str());
+		return;
 	}
 
 	if (!cmdParser.RequireParams(1))
@@ -43,4 +46,5 @@ int main(int argc, char** argv)
 	}
 
 	printf("GetParam(1) is %s\n", cmdParser.GetParam(1).c_str());
+	return;
 }
