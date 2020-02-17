@@ -25,17 +25,18 @@ namespace CP {
 		bool FindInRegisteredCommands(const Command&);
 		std::vector<std::string> SplitVector(const std::string&, const char& delim);
 
+		void ConsumeFlags();
+		void PrintUsage(const std::vector<std::string>&);
+
 	public:
 		CommandParser(int, char**);
 
 		bool RegisterCommand(const Command&);
-		void ConsumeFlags();
 		void RequireParams(size_t, const std::vector<std::string>& fillers);
 		std::string GetParam(const size_t);
 
 		bool HasCommand(const std::string&);
 		std::vector<std::string>* GetCommandParams(const std::string&);
-		void PrintUsage(const std::vector<std::string>&);
 		bool Failed();
 	};
 }
