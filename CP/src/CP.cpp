@@ -55,7 +55,7 @@ namespace CP {
 	}
 
 	CommandParser::CommandParser(int argc, char** args)
-		: m_Argc{argc}
+		: m_Argc{ argc }, m_NeededParams{ 0 }
 	{
 		for (int i = 0; i < argc; ++i)
 		{
@@ -124,12 +124,43 @@ namespace CP {
 			m_Args.erase(m_Args.begin() + i);
 		}
 
+		for (size_t i = 1; i < m_Args.size(); ++i)
+		{
+			if (m_Args[i].substr(0, 1) == "-" || m_Args[i].substr(0, 2) == "--")
+			{
+				m_Args.erase(m_Args.begin() + i);
+				i--;
+			}
+		}
+
 		
 	}
 
-	bool CommandParser::RequireParams(const size_t needed) const
+	void CommandParser::RequireParams(size_t needed, const std::vector<std::string>& fillers)
 	{
-		return needed + 1 == m_Args.size();
+		ConsumeFlags();
+
+		m_NeededParams = needed;
+
+		if(Failed())
+		{
+			std::vector<std::string> temp;
+			temp.reserve(m_NeededParams);
+
+			for(const auto& filler : fillers)
+			{
+				filler.empty() ? temp.emplace_back("unspecified") : temp.emplace_back(filler);
+				needed--;
+			}
+
+			for (int i = 0; i < needed; ++i)
+			{
+				temp.emplace_back("unspecified");
+			}
+
+			PrintUsage(temp);
+		}
+
 	}
 
 	std::string CommandParser::GetParam(const size_t index)
@@ -196,7 +227,7 @@ namespace CP {
 
 			for(uint32_t i = 0; i < cmd.NumParams; i++)
 			{
-				printf(" param%i", i + 1);
+				printf(" <param>");
 			}
 
 			printf("]");
@@ -213,7 +244,7 @@ namespace CP {
 
 			for (uint32_t i = 0; i < cmd.NumParams; i++)
 			{
-				p += " param" + std::to_string(i + 1);
+				p += " <param>";
 			}
 
 			p += "]";
@@ -224,6 +255,11 @@ namespace CP {
 		}
 
 		printf("\n\n");
+	}
+
+	bool CommandParser::Failed()
+	{
+		return !(m_NeededParams + 1 == m_Args.size());		
 	}
 }
 

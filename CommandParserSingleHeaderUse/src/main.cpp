@@ -18,8 +18,11 @@ int main(int argc, char** argv)
 	b = cmdParser.RegisterCommand(cmdNotWorking);	// Success
 	b = cmdParser.RegisterCommand(cmdNewPath);		// Success
 
-	cmdParser.ConsumeFlags();
-
+	cmdParser.RequireParams(1, { "name" });
+	if (cmdParser.Failed())
+	{
+		return -1;
+	}
 
 	if (cmdParser.HasCommand("-v"))
 	{
@@ -34,12 +37,6 @@ int main(int argc, char** argv)
 	if (cmdParser.HasCommand("Path"))
 	{
 		printf("Command -path with parameter '%s' found!\n", cmdParser.GetCommandParams("Path")->at(0).c_str());
-	}
-
-	if (!cmdParser.RequireParams(1))
-	{
-		cmdParser.PrintUsage({ "name" });
-		return 1;
 	}
 
 	printf("GetParam(1) is %s\n", cmdParser.GetParam(1).c_str());

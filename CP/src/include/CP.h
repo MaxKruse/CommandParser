@@ -9,13 +9,14 @@ namespace CP {
 		std::string Description;
 		uint32_t	NumParams;
 		std::vector<std::string> Params;
-		bool		Exists;
+		bool		Required;
 	};
 
 	class CommandParser
 	{
 	private:
 		int m_Argc;
+		size_t m_NeededParams;
 		std::vector<std::string> m_Args;
 		std::vector<Command> m_RegisteredCommands;
 		std::vector<Command> m_Commands;
@@ -29,12 +30,13 @@ namespace CP {
 
 		bool RegisterCommand(const Command&);
 		void ConsumeFlags();
-		bool RequireParams(const size_t) const;
+		void RequireParams(size_t, const std::vector<std::string>& fillers);
 		std::string GetParam(const size_t);
 
 		bool HasCommand(const std::string&);
 		std::vector<std::string>* GetCommandParams(const std::string&);
 		void PrintUsage(const std::vector<std::string>&);
+		bool Failed();
 	};
 }
 
